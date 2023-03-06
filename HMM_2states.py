@@ -107,14 +107,14 @@ def compare_hidden_states(hmm_model, cols_features, conf_interval, iters = 1000)
 # get historical market data
 spy = yf.Ticker("SPY")
 spy.info
-hist = spy.history(period="max")
+df = spy.history(period="max")
 
 column_price = 'Close'
 column_high = 'High'
 column_low = 'Low'
 column_volume = 'Volume'
 
-dataset = hist.shift(1)
+dataset = df.shift(1)
 
 # Feature params
 future_period = 1
@@ -148,8 +148,8 @@ plt.tight_layout()
 
 model = get_best_hmm_model(X = train_set, max_states = 2, max_iter = 100000000000000000000000000000)
 print("Best model with {0} states ".format(str(model.n_components)))
-df = pd.DataFrame(model.transmat_)
-print("\n The HMM transition matrix: \n ",df)
+df1 = pd.DataFrame(model.transmat_)
+print("\n The HMM transition matrix: \n ",df1)
 
 
 
@@ -158,8 +158,16 @@ print("\n The HMM transition matrix: \n ",df)
 plot_hidden_states(model, dataset[:train_ind].reset_index(), train_set, column_price)
 #compare_hidden_states(hmm_model=model, cols_features=cols_features, conf_interval=0.95)
 
+# Recreate today's data in another data frame
+df['last_return'] = df[column_price].pct_change()
+df['std_normalized'] = df[column_price].rolling(std_period).apply(std_normalized)
+df['ma_ratio'] = df[column_price].rolling(ma_period).apply(ma_ratio)
+df['price_deviation'] = df[column_price].rolling(price_deviation_period).apply(values_deviation)
+df['volume_deviation'] = df[column_volume].rolling(volume_deviation_period).apply(values_deviation)
+df = df.replace([np.inf, -np.inf], np.nan)
+df = df.dropna()
 
-
-last_row = dataset[cols_features].values[-1:]
+last_row = df[-1:]
+last_row = df[cols_features].values[-1:]
 result = model.predict(last_row)
 print("\n Today's hidden state: ", result)
