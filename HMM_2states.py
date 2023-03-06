@@ -148,7 +148,7 @@ plt.tight_layout()
 model = get_best_hmm_model(X = train_set, max_states = 2, max_iter = 100000000000000000000000000000)
 print("Best model with {0} states ".format(str(model.n_components)))
 df1 = pd.DataFrame(model.transmat_)
-print("\n The HMM transition matrix: \n ",df1)
+print("\n The best model transition matrix: \n ",df1)
 
 
 
