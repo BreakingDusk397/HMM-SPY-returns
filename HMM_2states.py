@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 from matplotlib import cm, pyplot as plt
 from hmmlearn.hmm import GaussianHMM
 import scipy
